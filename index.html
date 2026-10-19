@@ -4,7 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Từ vựng 當代中文 L6</title>
-<link rel="stylesheet" href="../../assets/site.css">
+<style>
+/* Bộ màu, font, thanh menu và chân trang dùng chung cho mọi trang.
+   Màu lấy theo web IEC (duhociec.site): nền kem, nâu caramel, chữ nâu đậm.
+   Sửa màu ở đây là mọi trang đổi theo. */
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;700&family=IBM+Plex+Mono:wght@500;600&family=Playfair+Display:wght@600;700&display=swap");
+
+:root{
+  --bg:#f4ece3; --surface:#ffffff; --ink:#2a1d15; --muted:#5e4b3e; --line:#d9c8b7;
+  --brand:#a86b3c; --accent:#8f5a32; --accent-soft:#efdfcd; --gold:#c9963f;
+  --ok:#1f7a4d; --ok-soft:#e2f2e9; --bad:#b23b2a; --bad-soft:#f7e3e0;
+  --deep:#3b2a20; --deep-ink:#e8dccf;
+  --f-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-display:"Playfair Display",Georgia,serif;
+  --f-zh:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1b1410; --surface:#251c16; --ink:#f1e7dc; --muted:#bfa995; --line:#3d2f25;
+  --brand:#c98a55; --accent:#d9a06a; --accent-soft:#3a2a1e; --gold:#d9ad55;
+  --ok:#6cc28f; --ok-soft:#173226; --bad:#e68a7a; --bad-soft:#3a1f1a;
+  --deep:#120d0a; --deep-ink:#e8dccf; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1b1410; --surface:#251c16; --ink:#f1e7dc; --muted:#bfa995; --line:#3d2f25;
+  --brand:#c98a55; --accent:#d9a06a; --accent-soft:#3a2a1e; --gold:#d9ad55;
+  --ok:#6cc28f; --ok-soft:#173226; --bad:#e68a7a; --bad-soft:#3a1f1a;
+  --deep:#120d0a; --deep-ink:#e8dccf; color-scheme:dark}
+</style>
 <style>
 /* Layout: one narrow exam column; header strip carries section, step counter and 90-min clock; level meter is the one visual signature */
 *{box-sizing:border-box}
@@ -341,6 +367,5 @@ function sendResult(r){if(!SHEET_URL||S.sent)return;S.sent=true;
 reset();intro();
 </script>
 
-<script src="../../assets/site.js" data-page="kiem-tra" data-foot="0" data-login="required"></script>
 </body>
 </html>
