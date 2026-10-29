@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bài 8 當代中文</title>
+<style>
+/* Bộ màu, font, thanh menu và chân trang dùng chung cho mọi trang.
+   Màu lấy theo web IEC (duhociec.site): nền kem, nâu caramel, chữ nâu đậm.
+   Sửa màu ở đây là mọi trang đổi theo. */
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;700&family=IBM+Plex+Mono:wght@500;600&family=Playfair+Display:wght@600;700&display=swap");
+
+:root{
+  --bg:#f4ece3; --surface:#ffffff; --ink:#2a1d15; --muted:#5e4b3e; --line:#d9c8b7;
+  --brand:#a86b3c; --accent:#8f5a32; --accent-soft:#efdfcd; --gold:#c9963f;
+  --ok:#1f7a4d; --ok-soft:#e2f2e9; --bad:#b23b2a; --bad-soft:#f7e3e0;
+  --deep:#3b2a20; --deep-ink:#e8dccf;
+  --f-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-display:"Playfair Display",Georgia,serif;
+  --f-zh:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1b1410; --surface:#251c16; --ink:#f1e7dc; --muted:#bfa995; --line:#3d2f25;
+  --brand:#c98a55; --accent:#d9a06a; --accent-soft:#3a2a1e; --gold:#d9ad55;
+  --ok:#6cc28f; --ok-soft:#173226; --bad:#e68a7a; --bad-soft:#3a1f1a;
+  --deep:#120d0a; --deep-ink:#e8dccf; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1b1410; --surface:#251c16; --ink:#f1e7dc; --muted:#bfa995; --line:#3d2f25;
+  --brand:#c98a55; --accent:#d9a06a; --accent-soft:#3a2a1e; --gold:#d9ad55;
+  --ok:#6cc28f; --ok-soft:#173226; --bad:#e68a7a; --bad-soft:#3a1f1a;
+  --deep:#120d0a; --deep-ink:#e8dccf; color-scheme:dark}
+</style>
+<style>
+/* Layout: one narrow exam column; header strip carries section, step counter and 90-min clock; level meter is the one visual signature */
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.6}
+.wrap{max-width:680px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:16px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-weight:700;letter-spacing:.02em}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.hud{display:flex;gap:12px;align-items:center}
+.step{font-family:var(--f-num);font-size:13px;color:var(--muted)}
+.clock{font-family:var(--f-num);font-weight:600;font-size:15px;font-variant-numeric:tabular-nums;padding:3px 10px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.clock.warn{background:var(--bad-soft);color:var(--bad)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+h1,h2{margin:0;text-wrap:balance;line-height:1.3}
+h1{font-size:24px} h2{font-size:18px}
+p{margin:0}
+.muted{color:var(--muted)}
+.label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px 14px;font-size:14px}
+.lessons span{font-family:var(--f-zh)}
+.lessons b{font-family:var(--f-num);font-weight:500;color:var(--accent);margin-right:6px}
+ul.rules{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+input[type=text]{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid transparent;padding:11px 18px;font-weight:600}
+button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.primary{background:var(--accent);color:var(--surface)}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.meter{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.steps{display:flex;align-items:flex-end;gap:3px}
+.steps i{display:block;width:14px;border-radius:2px;background:var(--line)}
+.steps i:nth-child(1){height:8px}.steps i:nth-child(2){height:14px}.steps i:nth-child(3){height:20px}
+.steps i.on{background:var(--gold)}
+.passage{font-family:var(--f-zh);font-size:19px;line-height:1.9;background:var(--bg);border-radius:8px;padding:14px 16px}
+.figure{display:flex;justify-content:center;background:var(--bg);border-radius:8px;padding:10px}
+.figure svg{width:220px;max-width:100%;height:auto}
+.q{font-family:var(--f-zh);font-size:19px;font-weight:700}
+.q.qv{font-family:var(--f-ui);font-size:16px;font-weight:600}
+.cast{font-size:13px;color:var(--muted);margin:0}.cast .zht{font-family:var(--f-zh);color:var(--ink)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts.pics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);color:var(--ink);font-family:var(--f-zh);font-size:18px;font-weight:500;padding:12px 14px;min-width:0}
+.opts.pics .opt{flex-direction:column;gap:6px;padding:10px 6px}
+.opts.pics .opt svg{width:100%;max-width:120px;height:auto}
+.opt .k{font-family:var(--f-num);font-size:13px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:none;color:var(--muted)}
+.opt[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft)}
+.opt[aria-pressed=true] .k{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+/* pictograms */
+.pic *{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pic .f{fill:var(--accent-soft)} .pic .a{fill:var(--accent)} .pic .g{fill:var(--gold)} .pic .r{fill:var(--bad)} .pic .w{fill:var(--surface)}
+.pic text{fill:var(--ink);stroke:none;font:600 13px var(--f-num)}
+.play{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.notice{font-size:13px;background:var(--bad-soft);color:var(--ink);border-radius:8px;padding:10px 12px}
+.transcript{font-family:var(--f-zh);font-size:17px;line-height:1.8;border-left:3px solid var(--line);padding-left:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.big{font-family:var(--f-num);font-size:30px;font-weight:500;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+svg.trace{width:100%;height:auto;max-width:100%}
+.trace .grid{stroke:var(--line);stroke-width:1}
+.trace .path{fill:none;stroke:var(--accent);stroke-width:2}
+.trace .dot-ok{fill:var(--ok)} .trace .dot-bad{fill:var(--surface);stroke:var(--bad);stroke-width:2}
+.trace text{fill:var(--muted);font-family:var(--f-num);font-size:10px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+td.zht{font-family:var(--f-zh)}
+.barcell{display:flex;align-items:center;gap:8px}
+.hbar{flex:1;height:6px;background:var(--line);border-radius:3px;min-width:60px;overflow:hidden}
+.hbar span{display:block;height:100%;background:var(--accent)}
+details{border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font-weight:600}
+.rev{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.rev>div{font-size:14px;padding:10px 12px;border-radius:8px;background:var(--bg)}
+.rev .zhs{font-family:var(--f-zh);font-size:16px}
+.tag-ok{color:var(--ok);font-weight:600}.tag-bad{color:var(--bad);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{transform:translateY(4px)}to{transform:none}}}
+</style>
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="bar">
+    <div class="brand">Bài 8 · 當代中文 第一冊<small>Kiểm tra từ vựng + cách dùng từ · 坐火車去臺南</small></div>
+    <div class="hud"><span class="step" id="step"></span><span class="clock" id="clock" hidden></span></div>
+  </div>
+  <main id="app"></main>
+</div>
+
+<script>
+/* ======================= CẤU HÌNH ======================= */
+const LESSON="第八課 坐火車去臺南";
+const MINUTES=25;            // thời gian làm bài
+const SHEET_URL="https://script.google.com/macros/s/AKfycbxJLHZgKhpOgP4l6VUuWDy-IHvLnzrfiKvjBL6ZwrCstAoewt_Xqz-Np-w8xgPDkDfBQw/exec"; // cùng Apps Script với bài 6, bài 7 (tự tạo tab theo SHEET_NAME); để trống = không gửi
+const SHEET_NAME="Bài 8";    // tên tab nhận kết quả trong Google Sheet
+const PTS=N=>+(100/N).toFixed(2);  // điểm mỗi câu = 100 ÷ tổng số câu (50 câu → 2 điểm/câu)
+const GRADES=[[90,"Thuộc tốt","Đã nắm bài 8, học tiếp bài 9"],[75,"Khá","Ôn lại phần sai rồi học tiếp"],
+  [60,"Cần ôn","Ôn kỹ từ và ngữ pháp sai, làm lại bài sau 2–3 ngày"],[0,"Chưa thuộc","Học lại từ vựng và ngữ pháp bài 8"]];
+
+/* ======================= TỪ VỰNG BÀI 8 (theo sách, 生詞一 + 生詞二) =======================
+   Mỗi dòng: [chữ Hán, nghĩa tiếng Việt, nhóm, hội thoại, p1]
+   nhóm: phương án nhiễu lấy cùng nhóm · p1=1: hỏi ở Phần 1 · p1=0: kiểm tra trong Phần 2 (ngữ pháp) */
+const VOCAB=[
+["坐","ngồi; đi (tàu, xe)","dongtu",1,1],
+["火車","tàu hỏa","xe",1,1],
+["跟","cùng với","khac",1,0],
+["玩","chơi","dongtu",1,1],
+["怎麼","thế nào, bằng cách nào","khac",1,0],
+["慢","chậm","tinh",1,1],
+["鐘頭","tiếng (đồng hồ)","khac",1,1],
+["比較","tương đối, … hơn","khac",1,0],
+["快","nhanh","tinh",1,1],
+["車票","vé (tàu, xe)","xe",1,1],
+["非常","vô cùng, rất","tinh",1,1],
+["但是","nhưng","khac",1,1],
+["又","vừa (又…又…)","khac",1,0],
+["舒服","thoải mái, dễ chịu","tinh",1,1],
+["站","nhà ga, trạm","xe",1,1],
+["或是","hoặc, hay là","khac",1,1],
+["網路上","trên mạng","khac",1,1],
+["便利商店","cửa hàng tiện lợi","khac",1,1],
+["同學","bạn học","khac",2,1],
+["參觀","tham quan","dongtu",2,1],
+["古代","thời cổ đại","khac",2,1],
+["騎","cưỡi, lái (xe máy, xe đạp)","dongtu",2,1],
+["機車","xe máy","xe",2,1],
+["載","chở (ai đó)","dongtu",2,1],
+["捷運","tàu điện MRT","xe",2,1],
+["比","so với, hơn (A 比 B)","khac",2,0],
+["公車","xe buýt","xe",2,1],
+["不行","không được","tinh",2,1],
+["計程車","taxi","xe",2,1],
+["差不多","gần như nhau, xấp xỉ","tinh",2,1],
+];
+const NO_LISTEN=new Set([]); // từ máy dễ đọc sai thì thêm vào đây
+
+/* ======================= PHẦN 2: CÁCH DÙNG TỪ + NGỮ PHÁP =======================
+   g: nhóm · w: từ bài 8 liên quan · t: câu có chỗ trống · q: câu hỏi · o: phương án (ĐÚNG LUÔN VIẾT ĐẦU) */
+const GRAM={dungtu:"Dùng từ đúng",gen:"跟 (cùng với)",zenme:"怎麼 (thế nào)",bijiao:"比較 (… hơn)",you:"又…又…",bi:"A 比 B"};
+const Q_FILL="Chọn từ phù hợp điền vào chỗ trống.",Q_RIGHT="Câu nào đúng ngữ pháp?",Q_CLOCK="";
+const CONTEXT=[
+// Dùng từ đúng
+{g:"dungtu",w:"騎,機車",t:"我想＿＿機車去學校。",q:Q_FILL,o:["騎","參觀","玩","比"]},
+{g:"dungtu",w:"坐,捷運",t:"我們＿＿捷運去故宮。",q:Q_FILL,o:["坐","騎","載","玩"]},
+{g:"dungtu",w:"載,騎,同學",t:"我同學騎機車＿＿我去學校。",q:Q_FILL,o:["載","坐","參觀","比"]},
+{g:"dungtu",w:"參觀",t:"明天我們要去＿＿故宮博物院。",q:Q_FILL,o:["參觀","坐","騎","載"]},
+{g:"dungtu",w:"鐘頭,火車",t:"坐火車到臺南要四個多＿＿。",q:Q_FILL,o:["鐘頭","車票","站","古代"]},
+{g:"dungtu",w:"車票,網路上",t:"我在網路上買高鐵＿＿。",q:Q_FILL,o:["車票","鐘頭","古代","不行"]},
+{g:"dungtu",w:"便利商店",t:"你可以在＿＿買咖啡，很方便。",q:Q_FILL,o:["便利商店","捷運","計程車","古代"]},
+{g:"dungtu",w:"差不多",t:"「騎機車比坐公車快嗎？」「＿＿。」",q:Q_FILL,o:["差不多","不行","或是","但是"]},
+{g:"dungtu",w:"不行,捷運",t:"「我們坐捷運去故宮吧！」「＿＿，到故宮沒有捷運。」",q:Q_FILL,o:["不行","差不多","非常","或是"]},
+{g:"dungtu",w:"或是,公車,計程車",t:"你可以坐公車＿＿坐計程車去。",q:Q_FILL,o:["或是","但是","又","比"]},
+// 跟
+{g:"gen",w:"跟,同學",t:"我週末要＿＿同學去參觀故宮。",q:Q_FILL,o:["跟","比","又","坐"]},
+{g:"gen",w:"跟",t:"他跟我一起去KTV唱歌。",q:"Đổi sang phủ định. Câu nào đúng?",o:["他不跟我一起去KTV唱歌。","不他跟我一起去KTV唱歌。","他跟我一起去KTV唱歌不。","他跟不我一起去KTV唱歌。"]},
+{g:"gen",w:"跟",q:Q_RIGHT,o:["我常跟哥哥去看比賽。","我常去看比賽跟哥哥。","我常跟去哥哥看比賽。","我跟常哥哥去看比賽。"]},
+// 怎麼
+{g:"zenme",w:"怎麼",t:"「你們＿＿去臺南？」「坐高鐵去。」",q:Q_FILL,o:["怎麼","怎麼樣","什麼","哪裡"]},
+{g:"zenme",w:"怎麼",t:"「這個字＿＿寫？」",q:Q_FILL,o:["怎麼","怎麼樣","什麼","幾"]},
+{g:"zenme",w:"怎麼,玩",t:"「臺南＿＿？」「很好玩。」",q:Q_FILL,o:["怎麼樣","怎麼","什麼","哪裡"]},
+// 比較
+{g:"bijiao",w:"比較,快,慢",t:"坐公車很慢，坐捷運＿＿快。",q:Q_FILL,o:["比較","比","又","跟"]},
+{g:"bijiao",w:"比較",t:"我最近比較忙。",q:"Đổi sang phủ định. Câu nào đúng?",o:["我最近比較不忙。","我最近不比較忙。","不我最近比較忙。","我最近比較忙不。"]},
+{g:"bijiao",w:"比較",t:"「咖啡和茶，你比較喜歡喝什麼？」",q:"Câu trả lời nào đúng?",o:["我比較喜歡喝茶。","我比喜歡喝茶。","我比較喝茶喜歡。","我喜歡比較喝茶。"]},
+// 又…又…
+{g:"you",w:"又,快,舒服",t:"坐高鐵＿＿快＿＿舒服。",q:Q_FILL,o:["又…又","比…比","跟…跟","或是…或是"]},
+{g:"you",w:"又",q:Q_RIGHT,o:["這家餐廳的菜又便宜又好吃。","這家餐廳的菜又便宜好吃又。","這家餐廳又的菜便宜又好吃。","又這家餐廳的菜便宜又好吃。"]},
+{g:"you",w:"又",t:"這家店的咖啡又便宜又好喝。",q:"Đổi sang phủ định (vừa không… vừa không…). Câu nào đúng?",o:["這家店的咖啡又不便宜又不好喝。","這家店的咖啡不又便宜又好喝。","這家店的咖啡又便宜不又好喝。","這家店的咖啡不又便宜不又好喝。"]},
+// A 比 B
+{g:"bi",w:"比,快,捷運,公車",q:Q_RIGHT,o:["坐捷運比坐公車快。","坐捷運比坐公車很快。","坐捷運比坐公車非常快。","坐捷運快比坐公車。"]},
+{g:"bi",w:"比,機車",t:"我的機車比他的機車貴。",q:"Đổi sang phủ định. Câu nào đúng?",o:["我的機車不比他的機車貴。","我的機車比不他的機車貴。","不我的機車比他的機車貴。","我的機車比他的機車貴不。"]},
+{g:"bi",w:"比",t:"我們學校比他們學校遠。",q:"Câu trên nghĩa là gì?",o:["Trường chúng tôi xa hơn trường của họ.","Trường của họ xa hơn trường chúng tôi.","Trường chúng tôi gần hơn trường của họ.","Hai trường xa như nhau."]},
+];
+
+/* ======================= HÌNH: ĐỒNG HỒ ======================= */
+function clockSvg(h,m){const a1=((h%12)+m/60)*30*Math.PI/180,a2=m*6*Math.PI/180,cx=60,cy=45;
+  const end=(a,L)=>`${(cx+L*Math.sin(a)).toFixed(1)} ${(cy-L*Math.cos(a)).toFixed(1)}`;
+  const ticks=Array.from({length:12},(_,i)=>{const a=i*30*Math.PI/180,r1=i%3?33:30;return `<path d="M${end(a,r1)}L${end(a,37)}"/>`}).join("");
+  return `<circle class="w" cx="60" cy="45" r="40"/>${ticks}<path d="M60 45L${end(a1,20)}" style="stroke-width:4"/><path d="M60 45L${end(a2,31)}" style="stroke-width:2.5"/><circle class="a" cx="60" cy="45" r="3"/>`}
+const pic=s=>{const[n,h,m]=s.split(":");return `<svg class="pic" viewBox="0 0 120 90" role="img" aria-label="Đồng hồ">${clockSvg(+h,+m)}</svg>`};
+const altImg=s=>{const[,h,m]=s.split(":");return `đồng hồ ${h}:${m.padStart(2,"0")}`};
+
+/* ======================= TẠO ĐỀ ======================= */
+const TYPES={
+  nghe:{vi:"Nghe → chọn chữ",q:"Nghe và chọn chữ Hán đúng."},
+  nghia:{vi:"Chữ → nghĩa",q:"Từ này nghĩa là gì?"},
+  chu:{vi:"Nghĩa → chữ",q:"Chọn chữ Hán đúng với nghĩa:"},
+  ctx:{vi:"Ngữ pháp",q:Q_FILL},
+};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const W=VOCAB.map(([zh,vi,grp,d,p1])=>({zh,vi,grp,d,p1}));
+const P1=W.filter(w=>w.p1);
+/* 3 phương án nhiễu: ưu tiên cùng nhóm, thiếu thì lấy nhóm khác (chỉ trong các từ Phần 1) */
+function others(w,key){const same=shuffle(P1.filter(x=>x!==w&&x.grp===w.grp)),rest=shuffle(P1.filter(x=>x!==w&&x.grp!==w.grp));
+  const pick=[],seen=new Set([w[key]]);for(const x of [...same,...rest]){if(!seen.has(x[key])){seen.add(x[key]);pick.push(x[key])}if(pick.length===3)break}return pick}
+function build(hasVoice){
+  const order=["nghe","nghia","chu"].filter(t=>hasVoice||t!=="nghe");
+  const part1=shuffle(P1).map((w,i)=>{let ty=order[i%order.length];if(ty==="nghe"&&NO_LISTEN.has(w.zh))ty="nghia";
+    if(ty==="nghe")return{ty,w:[w.zh],say:w.zh,o:[w.zh,...others(w,"zh")]};
+    if(ty==="nghia")return{ty,w:[w.zh],show:w.zh,o:[w.vi,...others(w,"vi")]};
+    return{ty,w:[w.zh],show:w.vi,o:[w.zh,...others(w,"zh")]}});
+  const part2=shuffle(CONTEXT).map(c=>({ty:"ctx",g:c.g,w:c.w?c.w.split(","):[],t:c.t,img:c.img,q:c.q,o:c.o}));
+  return part1.concat(part2).map(x=>({...x,order:shuffle(x.o.map((t,i)=>({t,i})))}))}
+
+/* ======================= GIỌNG ĐỌC (máy học viên) ======================= */
+const synth=window.speechSynthesis||null;let voice=null;
+function pickVoice(){if(!synth)return;const all=synth.getVoices().filter(x=>/^(zh|cmn)/i.test(x.lang)&&!/HK|yue|Cantonese/i.test(x.lang+x.name));
+  const nat=a=>a.slice().sort((x,y)=>(/natural|online/i.test(y.name)?1:0)-(/natural|online/i.test(x.name)?1:0));
+  voice=nat(all.filter(x=>/TW|Hant/i.test(x.lang)))[0]||nat(all)[0]||null;
+  const el=document.getElementById("voiceinfo");if(el)el.innerHTML=voiceInfo()}
+function voiceInfo(){return voice?`Giọng đọc: <b>${voice.name}</b>`:"Máy này chưa có giọng đọc tiếng Trung nên đề sẽ không có câu nghe. Muốn có phần nghe, hãy dùng Chrome hoặc Edge."}
+if(synth){pickVoice();synth.onvoiceschanged=pickVoice}
+function say(txt,done){if(!synth||!voice){done&&done();return}synth.cancel();
+  const u=new SpeechSynthesisUtterance(txt);u.voice=voice;u.lang=voice.lang;u.rate=.75;u.onend=()=>done&&done();synth.speak(u)}
+
+/* ======================= TRẠNG THÁI ======================= */
+const app=document.getElementById("app"),stepEl=document.getElementById("step"),clockEl=document.getElementById("clock");
+let S,timer=null;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function reset(){S={name:"",items:[],n:0,hist:[],choice:null,plays:0,deadline:0,timeUp:false,sent:false};
+  if(timer){clearInterval(timer);timer=null}clockEl.hidden=true}
+function startClock(){S.deadline=Date.now()+MINUTES*60000;clockEl.hidden=false;tick();timer=setInterval(tick,1000)}
+function tick(){const ms=Math.max(0,S.deadline-Date.now()),m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);
+  clockEl.textContent=`⏱ ${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  clockEl.classList.toggle("warn",ms<=5*60000);
+  if(ms<=0){S.timeUp=true;if(synth)synth.cancel();results()}}
+
+/* ======================= MÀN HÌNH ======================= */
+function intro(){stepEl.textContent="";const N=P1.length+CONTEXT.length;
+  const d1=W.filter(w=>w.d===1).map(w=>w.zh).join("、"),d2=W.filter(w=>w.d===2).map(w=>w.zh).join("、");
+  app.innerHTML=`<section class="card">
+  <span class="label">Phạm vi</span>
+  <h1>Kiểm tra 《當代中文課程》第一冊 ${LESSON}</h1>
+  <div class="lessons"><div><b>Từ vựng 1</b><span>${d1}</span></div><div><b>Từ vựng 2</b><span>${d2}</span></div>
+    <div><b>Ngữ pháp</b><span>跟、怎麼、比較、又…又…、A比B</span></div></div>
+  <span class="label">Cách làm</span>
+  <ul class="rules">
+    <li>Thời gian: <b>${MINUTES} phút</b>. Hết giờ, bài tự nộp.</li>
+    <li>Tổng <b>${N} câu, thang 100 điểm</b>: mỗi câu đúng <b>${PTS(N)} điểm</b>, câu nào cũng bằng nhau.</li>
+    <li>Phần 1 · <b>Từ vựng</b> (${P1.length} câu): nghe chọn chữ, chữ → nghĩa, nghĩa → chữ.</li>
+    <li>Phần 2 · <b>Cách dùng từ + ngữ pháp</b> (${CONTEXT.length} câu): điền từ vào câu, chọn câu đúng, đổi câu phủ định.</li>
+    <li>Không quay lại câu trước được. Mỗi câu nghe phát tối đa 2 lần, nên bật loa hoặc đeo tai nghe.</li>
+    <li class="muted" id="voiceinfo">${voiceInfo()}</li>
+  </ul>
+  <label class="label" for="nm">Họ tên học viên</label>
+  <input type="text" id="nm" placeholder="Ví dụ: Nguyễn Văn An" autocomplete="name">
+  <div class="row"><button class="primary" id="go">Bắt đầu làm bài</button></div>
+</section>`;
+  document.getElementById("go").onclick=()=>{S.name=document.getElementById("nm").value.trim();
+    S.items=build(!!(synth&&voice));startClock();render()}}
+
+function render(){if(S.timeUp)return;const it=S.items[S.n],N=S.items.length,p1=S.items.filter(x=>x.ty!=="ctx").length;
+  const inP1=it.ty!=="ctx";S.choice=null;S.plays=0;
+  stepEl.textContent=`${inP1?"Phần 1":"Phần 2"} · ${S.n+1}/${N}`;
+  const big=it.show?`<div class="passage" style="text-align:center;font-size:${it.ty==="chu"?"20px;font-family:var(--f-ui)":"34px"}">${esc(it.show)}</div>`:"";
+  const viOpts=it.ty==="nghia"||it.o.some(x=>/[a-zA-Zà-ỹÀ-Ỹ]/.test(x));
+  app.innerHTML=`<section class="card">
+   <div class="bar"><span class="label">${inP1?"Phần 1 · Từ vựng":"Phần 2 · Cách dùng từ + ngữ pháp"}</span><span class="meter">${inP1?TYPES[it.ty].vi:GRAM[it.g]}</span></div>
+   ${it.ty==="nghe"?`<div class="play"><button class="ghost" id="pl">▶ Nghe (còn <span id="left">2</span> lần)</button></div>`:""}
+   ${it.img?`<div class="figure">${pic(it.img)}</div>`:""}
+   ${it.t?`<div class="passage">${esc(it.t)}</div>`:""}
+   <p class="q qv">${esc(it.q||TYPES[it.ty].q)}</p>
+   ${big}
+   <div class="opts">${it.order.map((o,j)=>`<button class="opt" data-i="${o.i}" aria-pressed="false"${viOpts?' style="font-family:var(--f-ui);font-size:16px"':""}><span class="k">${"ABCD"[j]}</span><span>${esc(o.t)}</span></button>`).join("")}</div>
+   <div class="row"><button class="primary" id="nx" disabled>${S.n+1===N?"Nộp bài":S.n+1===p1?"Sang phần 2":"Câu tiếp theo"}</button></div>
+  </section>`;
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{S.choice=+b.dataset.i;
+    app.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed",x===b));document.getElementById("nx").disabled=false});
+  document.getElementById("nx").onclick=answer;
+  if(it.ty==="nghe"){const pl=document.getElementById("pl");
+    pl.onclick=()=>{if(S.plays>=2)return;S.plays++;document.getElementById("left").textContent=2-S.plays;
+      pl.disabled=true;say(it.say,()=>{pl.disabled=S.plays>=2})}}}
+
+function answer(){if(synth)synth.cancel();const it=S.items[S.n];
+  S.hist.push({item:it,chosen:S.choice,ok:S.choice===0});S.n++;
+  S.n>=S.items.length?results():render()}
+
+/* ======================= KẾT QUẢ ======================= */
+const stemOf=it=>it.ty==="nghe"?`[Nghe] ${it.say}`:[it.img?`[Hình: ${altImg(it.img)}]`:"",it.t||it.show||"",it.ty==="ctx"&&!it.t&&!it.img?it.q:""].filter(Boolean).join(" ");
+const labelOf=it=>it.ty==="ctx"?GRAM[it.g]:TYPES[it.ty].vi;
+function weakWords(){const bad=new Set();S.hist.filter(h=>!h.ok).forEach(h=>h.item.w.forEach(x=>bad.add(x)));return W.filter(w=>bad.has(w.zh))}
+function weakGram(){return Object.keys(GRAM).filter(k=>S.hist.some(h=>!h.ok&&h.item.ty==="ctx"&&h.item.g===k))}
+function groupStats(){const rows=[];
+  // luôn đủ các dòng (kể cả 0 câu) để cột trong Google Sheet không bị lệch giữa các máy
+  ["nghe","nghia","chu"].forEach(k=>{const tot=S.items.filter(x=>x.ty===k).length;rows.push([TYPES[k].vi,S.hist.filter(h=>h.ok&&h.item.ty===k).length,tot])});
+  Object.keys(GRAM).forEach(k=>{const tot=S.items.filter(x=>x.ty==="ctx"&&x.g===k).length;rows.push([GRAM[k],S.hist.filter(h=>h.ok&&h.item.ty==="ctx"&&h.item.g===k).length,tot])});
+  return rows}
+function results(){if(timer){clearInterval(timer);timer=null}
+  const used=Math.min(MINUTES,Math.round((Date.now()-(S.deadline-MINUTES*60000))/60000));
+  stepEl.textContent="Kết quả";
+  const N=S.items.length,c=S.hist.filter(h=>h.ok).length,score=+(c*PTS(N)).toFixed(1),[,gName,gAdv]=GRADES.find(g=>score>=g[0]);
+  const stats=groupStats(),weak=weakWords(),wg=weakGram();
+  const rows=stats.filter(r=>r[2]).map(([name,ok,tot])=>{const p=Math.round(ok/tot*100);
+    return `<tr><td>${name}</td><td>${ok}/${tot}</td><td><div class="barcell"><div class="hbar"><span style="width:${p}%"></span></div>${p}%</div></td></tr>`}).join("");
+  const rev=S.hist.map(h=>{const it=h.item;return `<div><span class="${h.ok?"tag-ok":"tag-bad"}">${h.ok?"Đúng":"Sai"}</span> · ${labelOf(it)}
+    <div class="zhs">${esc(stemOf(it))}</div>
+    <div class="zhs">Đáp án: ${esc(it.o[0])}${h.ok?"":` · Đã chọn: ${esc(it.o[h.chosen])}`}</div></div>`}).join("");
+  app.innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
+   <section class="card"><span class="label">Kết quả${S.timeUp?" · Hết giờ":""}</span>
+    <h1>${S.name?esc(S.name):"Học viên"}</h1>
+    <div class="row" style="align-items:baseline;gap:14px"><span class="big" style="font-size:44px">${score}<small class="muted" style="font-size:18px">/100</small></span>
+      <span class="pill" style="font-size:14px">${gName}</span></div>
+    <p>Đúng <b>${c}/${N}</b> câu × ${PTS(N)} điểm${S.hist.length<N?` · mới làm ${S.hist.length}/${N} câu`:""}. <b>Đề xuất:</b> ${gAdv}</p>
+    <p class="muted">${new Date().toLocaleString("vi-VN")} · Thời gian làm: ${used} phút</p>
+    <p id="sendst" class="muted">${SHEET_URL?"Đang gửi kết quả cho giáo viên…":"Chụp màn hình này gửi giáo viên."}</p></section>
+   <section class="card"><h2>Ngữ pháp cần ôn (${wg.length})</h2>
+    ${wg.length?`<ul class="rules">${wg.map(k=>`<li>${GRAM[k]}</li>`).join("")}</ul>`:`<p>Em làm đúng hết phần ngữ pháp. Giỏi lắm!</p>`}</section>
+   <section class="card"><h2>Từ cần ôn (${weak.length})</h2>
+    ${weak.length?`<div class="tbl"><table><thead><tr><th>Từ</th><th>Nghĩa</th></tr></thead><tbody>
+      ${weak.map(w=>`<tr><td class="zht">${w.zh}</td><td>${esc(w.vi)}</td></tr>`).join("")}</tbody></table></div>`
+      :`<p>Em nhớ hết các từ trong bài. Giỏi lắm!</p>`}</section>
+   <section class="card"><h2>Theo từng phần</h2>
+    <div class="tbl"><table><thead><tr><th>Phần</th><th>Đúng</th><th>Tỉ lệ</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <details><summary>Xem lại từng câu</summary><div class="rev">${rev}</div></details></section>
+   <div class="row"><button class="ghost" id="again">Làm lại từ đầu</button></div></div>`;
+  document.getElementById("again").onclick=()=>{reset();intro()};
+  sendResult({score,gName,gAdv,c,N,used,weak,wg,stats})}
+
+function sendResult(r){if(!SHEET_URL||S.sent)return;S.sent=true;
+  const wrong=S.hist.filter(h=>!h.ok).map(h=>`${labelOf(h.item)} · ${stemOf(h.item)} → chọn ${h.item.o[h.chosen]} (đúng: ${h.item.o[0]})`).join("\n");
+  // [tên cột, giá trị]: muốn thêm/bớt cột chỉ cần sửa ở đây, Apps Script tự tạo tiêu đề
+  const d={sheet:SHEET_NAME,cols:[["Họ tên",S.name||"(không tên)"],["Điểm /100",r.score],["Xếp loại",r.gName],["Đề xuất",r.gAdv],
+    ["Số câu đúng",`${r.c}/${r.N}`],...r.stats.map(([n,ok,tot])=>[n,tot?`${ok}/${tot}`:"–"]),
+    ["Ngữ pháp cần ôn",r.wg.map(k=>GRAM[k]).join("; ")],["Từ cần ôn",r.weak.map(w=>w.zh).join("、")],
+    ["Số phút làm",r.used],["Hết giờ?",S.timeUp?"Có":"Không"],["Các câu sai",wrong],["Email",""]]};
+  const st=document.getElementById("sendst");
+  fetch(SHEET_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(d)})
+    .then(()=>{if(st)st.textContent="✓ Đã gửi kết quả cho giáo viên."})
+    .catch(()=>{S.sent=false;if(st)st.textContent="Chưa gửi được kết quả (mất mạng?). Hãy chụp màn hình này gửi giáo viên."})}
+
+reset();intro();
+</script>
+</body>
+</html>
