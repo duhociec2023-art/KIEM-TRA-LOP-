@@ -138,8 +138,9 @@ const secLevel=h=>{const t=theta(h);return t===null?"Chưa làm":LEVELS[t<1.5?1:
 const GRADES=[[80,"Giỏi","Vững L1–9, học tiếp từ L10"],[65,"Khá","Ôn nhanh các bài yếu rồi học tiếp L10"],
   [50,"Trung bình","Ôn lại L1–9, tập trung các bài yếu"],[0,"Yếu","Học lại từ các bài yếu nhất"]];
 const grade=p=>GRADES.find(g=>p>=g[0]);
-const LEN={L:27,R:27};          // số câu mỗi phần
-const MINUTES=50;              // thời gian làm bài
+const LEN={L:27,R:27};          // 9 bài × 3 câu mỗi phần          // số câu mỗi phần
+const MIN={L:20,R:25};          // thời gian riêng từng phần (phút): Nghe 20, Đọc 25
+const MINUTES=MIN.L+MIN.R;      // tổng 45 phút
 const SHEET_URL="https://script.google.com/macros/s/AKfycbxJLHZgKhpOgP4l6VUuWDy-IHvLnzrfiKvjBL6ZwrCstAoewt_Xqz-Np-w8xgPDkDfBQw/exec";            // link /exec của Google Apps Script (để trống = không gửi)
 const ZN=["","一","兩","三","四","五"];
 
@@ -391,11 +392,12 @@ const meter=lv=>`<span class="steps" aria-hidden="true">${[1,2,3].map(n=>`<i cla
 const optText=(it,i)=>it.po?alt(it.o[i]):it.o[i];
 
 /* ---------- đồng hồ 90 phút ---------- */
-function startClock(){S.deadline=Date.now()+MINUTES*60000;clockEl.hidden=false;tick();timer=setInterval(tick,1000)}
+function startClock(m){if(timer)clearInterval(timer);S.deadline=Date.now()+m*60000;if(!S.t0)S.t0=Date.now();clockEl.hidden=false;tick();timer=setInterval(tick,1000)}
 function tick(){const ms=Math.max(0,S.deadline-Date.now()),m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);
   clockEl.textContent=`⏱ ${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-  clockEl.classList.toggle("warn",ms<=10*60000);
-  if(ms<=0){S.timeUp=true;if(synth)synth.cancel();results()}}
+  clockEl.classList.toggle("warn",ms<=3*60000);
+  if(ms<=0){if(synth)synth.cancel();clearInterval(timer);timer=null;
+    if(S.sec==="L"){S.lTimeUp=true;between()}else{S.timeUp=true;results()}}}
 
 /* ---------- giọng đọc ---------- */
 const synth=window.speechSynthesis||null;let voice=null;
@@ -418,7 +420,7 @@ app.innerHTML=`<section class="card">
   <div class="lessons">${Object.entries(LESSONS).map(([n,t])=>`<div><b>L${n}</b><span>${t}</span></div>`).join("")}</div>
   <span class="label">Cách làm</span>
   <ul class="rules">
-    <li>Thời gian: <b>${MINUTES} phút</b> cho cả bài. Hết giờ, bài tự nộp.</li>
+    <li>Thời gian: <b>Nghe ${MIN.L} phút + Đọc ${MIN.R} phút = ${MINUTES} phút</b>. Mỗi phần có đồng hồ riêng; hết giờ phần nào, phần đó tự kết thúc.</li>
     <li>Hai phần: <b>Nghe</b> (${LEN.L} câu) rồi <b>Đọc</b> (${LEN.R} câu). Có câu chọn hình, câu chọn đáp án và đoạn văn ngắn.</li>
     <li>Đề tự đổi độ khó theo bạn: đúng 2 câu liền thì câu sau khó hơn, sai thì câu sau dễ hơn.</li>
     <li>Không quay lại câu trước được. Mỗi câu nghe được phát tối đa 2 lần.</li>
@@ -428,9 +430,9 @@ app.innerHTML=`<section class="card">
   <input type="text" id="nm" placeholder="Ví dụ: Nguyễn Văn An" autocomplete="name">
   <div class="row"><button class="primary" id="go">Bắt đầu làm bài</button></div>
 </section>`;
-document.getElementById("go").onclick=()=>{S.name=document.getElementById("nm").value.trim();startClock();startSec("L")}}
+document.getElementById("go").onclick=()=>{S.name=document.getElementById("nm").value.trim();startSec("L")}}
 
-function startSec(sec){S.sec=sec;next()}
+function startSec(sec){S.sec=sec;startClock(MIN[sec]);next()}
 
 function pick(sec){const st=S.secs[sec];
   const cnt={};st.hist.forEach(h=>cnt[h.item.les]=(cnt[h.item.les]||0)+1);
@@ -442,7 +444,7 @@ function pick(sec){const st=S.secs[sec];
     return pool[Math.floor(Math.random()*pool.length)]}
   return null}
 
-function next(){if(S.timeUp)return;const st=S.secs[S.sec];
+function next(){if(S.timeUp||(S.sec==="L"&&S.lTimeUp))return;const st=S.secs[S.sec];
   if(st.hist.length>=LEN[S.sec]){S.sec==="L"?between():results();return}
   const item=pick(S.sec);if(!item){S.sec==="L"?between():results();return}
   st.used.add(item.id);if(item.g)st.groups.add(item.g);
@@ -482,10 +484,10 @@ function answer(){if(synth)synth.cancel();
   else{st.streak=0;if(st.level>1)st.level--}
   next()}
 
-function between(){stepEl.textContent="Hết phần Nghe";
+function between(){if(timer){clearInterval(timer);timer=null}clockEl.hidden=true;stepEl.textContent="Hết phần Nghe";
   app.innerHTML=`<section class="card"><span class="label">Xong phần 1/2</span>
-   <h2>Phần Nghe đã xong. Tiếp theo là phần Đọc.</h2>
-   <p class="muted">Phần Đọc có ${LEN.R} câu và bắt đầu lại ở độ khó 2. Đồng hồ vẫn tiếp tục chạy.</p>
+   <h2>${S.lTimeUp?"Hết giờ phần Nghe.":"Phần Nghe đã xong."} Tiếp theo là phần Đọc.</h2>
+   <p class="muted">Phần Đọc có ${LEN.R} câu, làm trong <b>${MIN.R} phút</b>, bắt đầu lại ở độ khó 2. Đồng hồ phần Đọc chỉ chạy khi bạn bấm nút bên dưới.</p>
    <div class="row"><button class="primary" id="go">Bắt đầu phần Đọc</button></div></section>`;
   document.getElementById("go").onclick=()=>startSec("R")}
 
@@ -499,7 +501,7 @@ function trace(hist,N){if(!hist.length)return `<p class="muted">Chưa làm câu 
    ${pts.map((p,i)=>(i%2===0||i===pts.length-1)?`<text x="${p[0]-4}" y="${H-2}">${i+1}</text>`:"").join("")}</svg>`}
 
 function results(){if(timer){clearInterval(timer);timer=null}
-  const used=Math.round((Date.now()-(S.deadline-MINUTES*60000))/60000);
+  const used=Math.round((Date.now()-(S.t0||Date.now()))/60000);
   stepEl.textContent="Kết quả";
   const all=[...S.secs.L.hist,...S.secs.R.hist];
   const pL=secPoints(S.secs.L.hist),pR=secPoints(S.secs.R.hist),total=pL+pR,[,gName,gAdv]=grade(total);
@@ -518,7 +520,7 @@ function results(){if(timer){clearInterval(timer);timer=null}
     <div class="zhs">${stem} <b>${esc(it.q)}</b></div>
     <div class="zhs">Đáp án: ${esc(optText(it,it.k))}${h.ok?"":` · Đã chọn: ${esc(optText(it,h.chosen))}`}</div></div>`}).join("");
   app.innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
-   <section class="card"><span class="label">Kết quả${S.timeUp?" · Hết giờ":""}</span>
+   <section class="card"><span class="label">Kết quả${S.lTimeUp||S.timeUp?" · Hết giờ "+[S.lTimeUp?"Nghe":"",S.timeUp?"Đọc":""].filter(Boolean).join(", "):""}</span>
     <h1>${S.name?esc(S.name):"Học viên"}</h1>
     <div class="row" style="align-items:baseline;gap:14px"><span class="big" style="font-size:44px">${total}<small class="muted" style="font-size:18px">/100</small></span>
       <span class="pill" style="font-size:14px">${gName}</span></div>
@@ -546,7 +548,7 @@ function sendResult(all,minutes,sc){if(!SHEET_URL||S.sent)return;S.sent=true;
     ["Nghe /50",sc.pL],["Mức Nghe",secLevel(S.secs.L.hist)],["Nghe đúng",right("L")],
     ["Đọc /50",sc.pR],["Mức Đọc",secLevel(S.secs.R.hist)],["Đọc đúng",right("R")],
     ...Object.keys(LESSONS).map(l=>["L"+l,les(+l)]),
-    ["Số phút làm",minutes],["Hết giờ?",S.timeUp?"Có":"Không"],["Các câu sai",wrong],["Email",(window.SiteUser&&SiteUser.get()&&SiteUser.get().email)||""]]};
+    ["Số phút làm",minutes],["Hết giờ?",[S.lTimeUp?"Nghe":"",S.timeUp?"Đọc":""].filter(Boolean).join(", ")||"Không"],["Các câu sai",wrong],["Email",(window.SiteUser&&SiteUser.get()&&SiteUser.get().email)||""]]};
   const st=document.getElementById("sendst");
   fetch(SHEET_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(d)})
     .then(()=>{if(st)st.textContent="✓ Đã gửi kết quả cho giáo viên."})
